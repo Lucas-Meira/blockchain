@@ -10,4 +10,4 @@ def digest(data: bytes) -> bytes:
 
 
 def is_hash_proofed(hash: bytes, difficulty: int, preffix: str) -> bool:
-    return hexdigest(hash).startswith(preffix * difficulty)
+    return hash.hex().startswith(preffix * difficulty)

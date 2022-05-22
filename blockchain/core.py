@@ -3,7 +3,7 @@ import time
 import typing
 from dataclasses import asdict, dataclass
 
-import utils
+from . import utils
 
 
 @dataclass
@@ -14,7 +14,7 @@ class Header:
 
 @dataclass
 class Payload:
-    number: int
+    sequence: int
     data: str
     timestamp: int
     prev_hash: bytes
@@ -25,8 +25,34 @@ class Block:
     header: Header
     payload: Payload
 
+    @property
+    def hash(self):
+        return self.header.hash
+
+    @property
+    def prev_hash(self):
+        return self.payload.prev_hash
+
+    @property
+    def sequence(self):
+        return self.payload.sequence
+
+    @property
+    def nonce(self):
+        return self.header.nonce
+
+    @property
+    def data(self):
+        return json.loads(self.payload.data)
+
     def __repr__(self) -> str:
-        return f"Block<{utils.hexdigest(self.header.hash)[:10]}...>"
+        return f"Block<{utils.hexdigest(self.hash)[:10]}...>"
+
+
+class InvalidBlockException(Exception):
+    def __init__(self, invalid_block: Block, message=None):
+        self.block = invalid_block
+        super().__init__(message)
 
 
 class BlockChain:
@@ -43,7 +69,7 @@ class BlockChain:
         return json.dumps(data, ensure_ascii=False).encode('utf8')
 
     def _create_genesis_block(self):
-        block_payload = Payload(number=0, data='Where it all started', timestamp=time.time_ns(), prev_hash='')
+        block_payload = Payload(sequence=0, data='Where it all started', timestamp=time.time_ns(), prev_hash='')
         block_header = Header(hash=utils.digest(self._to_json(asdict(block_payload))), nonce=0)
 
         self._chain.append(Block(block_header, block_payload))
@@ -52,16 +78,20 @@ class BlockChain:
     def _last_block(self) -> Block:
         return self._chain[-1]
 
+    @property
+    def size(self) -> int:
+        return self._last_block.sequence + 1
+
     def create_block(self, data: typing.Any) -> Block:
         block_payload = Payload(
-            number=self._last_block.payload.number + 1,
+            sequence=self.size,
             data=json.dumps(data),
             timestamp=time.time_ns(),
-            prev_hash=self._last_block.header.hash)
+            prev_hash=self._last_block.hash)
 
-        return Block(Header(0, b'0'*128), block_payload)
+        return Block(Header(0, b'0'*256), block_payload)
 
-    def mine(self, block: Block):
+    def mine(self, block: Block) -> float:
         nonce: int = 0
         start_time = time.time()
 
@@ -79,24 +109,22 @@ class BlockChain:
 
             mine_time = time.time() - start_time
 
-            print(f"Took {mine_time:5.5} seconds to mine block #{block.payload.number}!")
+            print(f"Took {mine_time:5.5} seconds to mine block #{block.sequence}!")
 
             header = Header(nonce, hash)
             block.header = header
 
             return mine_time
 
-    def _is_new_block_valid(self, block: Block):
-        if block.payload.prev_hash != self._last_block.header.hash:
-            print(f"Block #{block.payload.number} invalid! Previous hash is {self._last_block.header.hash[:10]!r}, "
-                  f"but got {block.header.hash[:10]!r}.")
+    def _is_new_block_valid(self, block: Block) -> bool:
+        if block.prev_hash != self._last_block.hash:
+            raise InvalidBlockException(
+                f"Block #{block.sequence} invalid! Previous hash is {self._last_block.hash[:10]!r}, "
+                f"but got {block.hash[:10]!r}.")
 
-            return False
-
-        if not utils.is_hash_proofed(block.header.hash, self._difficulty, self._preffix):
-            print(f"Block #{block.payload.number} invalid! Its signature is invalid. Got nonce {block.header.nonce}")
-
-            return False
+        elif not utils.is_hash_proofed(block.hash, self._difficulty, self._preffix):
+            raise InvalidBlockException(f"Block #{block.sequence} invalid! Its signature is invalid. "
+                                        f"Got nonce {block.nonce}")
 
         return True
 
@@ -105,14 +133,3 @@ class BlockChain:
             self._chain.append(block)
 
             print(f"Successfully added {block}!")
-
-
-if __name__ == "__main__":
-    blockchain = BlockChain()
-
-    for i in range(100):
-        new_block = blockchain.create_block(f"Block #{i}")
-        blockchain.mine(new_block)
-        blockchain.add_block(new_block)
-
-    print(blockchain._chain)
