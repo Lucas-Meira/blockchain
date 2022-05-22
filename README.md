@@ -1,3 +1,15 @@
+<p align="center">
+<a href="https://github.com/Lucas-Meira/blockchain/actions" target="_blank">
+    <img src="https://github.com/Lucas-Meira/blockchain/actions/workflows/ci.yml/badge.svg" alt="Test">
+</a>
+<a href="https://pypi.org/project/StupidBlockChain" target="_blank">
+    <img src="https://img.shields.io/pypi/v/StupidBlockChain.svg" alt="Package version">
+</a>
+<a href="https://pypi.org/project/StupidBlockChain" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/StupidBlockChain.svg?color=%2334D058" alt="Supported Python versions">
+</a>
+</p>
+
 # StupidBC
 
 StupidBC is a simple Python implementation of a blockchain.
