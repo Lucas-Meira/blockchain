@@ -10,6 +10,14 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install StupidB
 pip install StupidBC
 ```
 
+## Building
+
+Use Pythons's `build` package to build it.
+
+```bash
+python -m build
+```
+
 ## Usage
 
 ```python
