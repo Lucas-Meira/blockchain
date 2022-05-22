@@ -1,2 +1,2 @@
-from . import utils
-from .core import Header, Payload, Block, BlockChain
+from . import utils  # noqa
+from .core import Header, Payload, Block, BlockChain  # noqa

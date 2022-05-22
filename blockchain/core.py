@@ -119,12 +119,13 @@ class BlockChain:
     def _is_new_block_valid(self, block: Block) -> bool:
         if block.prev_hash != self._last_block.hash:
             raise InvalidBlockException(
+                block,
                 f"Block #{block.sequence} invalid! Previous hash is {self._last_block.hash[:10]!r}, "
                 f"but got {block.hash[:10]!r}.")
 
         elif not utils.is_hash_proofed(block.hash, self._difficulty, self._preffix):
-            raise InvalidBlockException(f"Block #{block.sequence} invalid! Its signature is invalid. "
-                                        f"Got nonce {block.nonce}")
+            raise InvalidBlockException(block, f"Block #{block.sequence} invalid! Its signature is invalid. "
+                                               f"Got nonce {block.nonce}")
 
         return True
 

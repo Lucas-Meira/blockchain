@@ -33,26 +33,26 @@ def test_digest_invalid_entry():
 def test_proofed_hash():
     proofed_hash = bytes.fromhex('00009bf721b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ecc')
 
-    assert utils.is_hash_proofed(proofed_hash, 4, '0') == True
+    assert utils.is_hash_proofed(proofed_hash, 4, '0')
 
     proofed_hash = bytes.fromhex('000009bf721b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ec')
 
-    assert utils.is_hash_proofed(proofed_hash, 4, '0') == True
+    assert utils.is_hash_proofed(proofed_hash, 4, '0')
 
     proofed_hash = bytes.fromhex('00000000001b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ec')
 
-    assert utils.is_hash_proofed(proofed_hash, 10, '0') == True
+    assert utils.is_hash_proofed(proofed_hash, 10, '0')
 
     proofed_hash = bytes.fromhex('55549bf721b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ecc')
 
-    assert utils.is_hash_proofed(proofed_hash, 3, '5') == True
+    assert utils.is_hash_proofed(proofed_hash, 3, '5')
 
 
 def test_unproofed_hash():
     unproofed_hash = bytes.fromhex('00019bf721b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ecc')
 
-    assert utils.is_hash_proofed(unproofed_hash, 4, '0') == False
+    assert not utils.is_hash_proofed(unproofed_hash, 4, '0')
 
     unproofed_hash = bytes.fromhex('00129bf721b1d923f01236d7d3ae0ade1c04fe22fa02f6e5308b757e37631ecc')
 
-    assert utils.is_hash_proofed(unproofed_hash, 4, '0') == False
+    assert not utils.is_hash_proofed(unproofed_hash, 4, '0')
